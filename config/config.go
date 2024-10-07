@@ -1,43 +1,15 @@
 package config
 
-import (
-	"encoding/json"
-	"fmt"
-	"log"
-	"os"
-)
+import "os"
 
-type Config struct {
-	Token     string `json:"token"`
-	BotPrefix string `json:"botPrefix"`
-	config    *Config
+type BotConfig struct {
+	Token_ID   string
+	User_ID    string
+	Channel_ID string
 }
 
-var (
-	Token     string
-	BotPrefix string
-)
-
-func ReadConfig() error {
-	fmt.Println("Reading the config.json")
-	file, err := os.ReadFile("./config.json")
-	if err != nil {
-		log.Panic("There has been an error reading the file")
-		os.Exit(1)
-	}
-
-	fmt.Println("Unmarshaling the json file")
-
-	var botConfig Config
-	err = json.Unmarshal(file, &botConfig)
-
-	if err != nil {
-		fmt.Println("There is a problem with the json")
-		os.Exit(1)
-	}
-	Token = botConfig.Token
-	BotPrefix = botConfig.BotPrefix
-
-	return nil
-
+func (b *BotConfig) LoadConfig() {
+	b.Channel_ID = os.Getenv("Channel_ID")
+	b.Token_ID = os.Getenv("TOKEN")
+	b.User_ID = os.Getenv("USER_ID")
 }
