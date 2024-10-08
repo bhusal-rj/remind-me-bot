@@ -56,7 +56,7 @@ func Start(botConfig config.BotConfig) {
 	}
 
 	c := cron.New()
-	_, err = c.AddFunc("39 20 * * *", func() {
+	_, err = c.AddFunc("0 9,21 * * *", func() {
 		count = count + 1
 		message := formatForDiscord(gemini.GetInfoFromGemini())
 		if len(Channel_ID) > 2 {
