@@ -2,12 +2,15 @@ package bot
 
 import (
 	"fmt"
-	"github.com/bhusal-rj/remind-me/config"
-	"github.com/bwmarrin/discordgo"
-	"github.com/robfig/cron/v3"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
+
+	"github.com/bhusal-rj/remind-me/config"
+	"github.com/bhusal-rj/remind-me/gemini"
+	"github.com/bwmarrin/discordgo"
+	"github.com/robfig/cron/v3"
 )
 
 var count = 1
@@ -35,9 +38,9 @@ func sendReminderToUser(s *discordgo.Session, userId, message string) {
 }
 
 func Start(botConfig config.BotConfig) {
-	TOKEN := botConfig.Token_ID
-	USER_ID := botConfig.User_ID
-	Channel_ID := botConfig.Channel_ID
+	TOKEN := config.InitialConfig.Token_ID
+	USER_ID := config.InitialConfig.User_ID
+	Channel_ID := config.InitialConfig.Channel_ID
 
 	dg, err := discordgo.New("Bot " + TOKEN)
 	if err != nil {
@@ -53,9 +56,9 @@ func Start(botConfig config.BotConfig) {
 	}
 
 	c := cron.New()
-	_, err = c.AddFunc("*/1 * * * *", func() {
+	_, err = c.AddFunc("39 20 * * *", func() {
 		count = count + 1
-		message := "Spamming You"
+		message := formatForDiscord(gemini.GetInfoFromGemini())
 		if len(Channel_ID) > 2 {
 			sendMessageToChannel(dg, Channel_ID, message)
 		}
@@ -72,4 +75,11 @@ func Start(botConfig config.BotConfig) {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-stop
+}
+func formatForDiscord(response string) string {
+	fmt.Println(response)
+	response = strings.ReplaceAll(response, "\\n\\n", " ")
+	response = strings.ReplaceAll(response, "\\n", " ")
+	response = strings.ReplaceAll(response, `"`, "")
+	return "<@731031505823858758> " + response
 }
