@@ -81,5 +81,6 @@ func formatForDiscord(response string) string {
 	response = strings.ReplaceAll(response, "\\n\\n", " ")
 	response = strings.ReplaceAll(response, "\\n", " ")
 	response = strings.ReplaceAll(response, `"`, "")
-	return "<@731031505823858758> " + response
+
+	return fmt.Sprintf("<@%s>", config.InitialConfig.User_ID) + response
 }
